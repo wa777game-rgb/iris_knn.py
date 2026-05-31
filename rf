@@ -1,0 +1,91 @@
+Exercise 2: Hyper Parameter Tuning with Random Forest 
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt 
+import seaborn as sns 
+from sklearn.model_selection import train_test_split, GridSearchCV 
+from sklearn.ensemble import RandomForestClassifier 
+from sklearn.metrics import accuracy_score, classification_report, 
+confusion_matrix, RocCurveDisplay, roc_auc_score 
+# ------------------------------- 
+# 1. Load dataset 
+# ------------------------------- 
+df = pd.read_excel("/content/heart.xlsx") # Changed to pd.read_excel 
+ 
+# ------------------------------- 
+# 2. Features & Target 
+# ------------------------------- 
+X = df.drop("target", axis=1) 
+y = df["target"] 
+ 
+# ------------------------------- 
+# 3. Train-test split 
+# ------------------------------- 
+X_train, X_test, y_train, y_test = train_test_split( 
+    X, y, 
+    test_size=0.2, 
+    random_state=42 
+) 
+ 
+# ------------------------------- 
+# 4. Model + Hyperparameter Grid 
+# ------------------------------- 
+rf = RandomForestClassifier(random_state=42) 
+ 
+param_grid = { 
+    "n_estimators": [100, 200], 
+    "max_depth": [5, 10], 
+    "min_samples_split": [2, 5], 
+    "min_samples_leaf": [1, 2], 
+    "max_features": ["sqrt", "log2"] 
+} 
+ 
+# ------------------------------- 
+# 5. GridSearchCV (CV included) 
+# ------------------------------- 
+grid_search = GridSearchCV( 
+    estimator=rf, 
+    param_grid=param_grid, 
+    cv=3, 
+    n_jobs=-1, 
+    scoring="accuracy", 
+    verbose=1 
+) 
+grid_search.fit(X_train, y_train) 
+# Best model 
+best_model = grid_search.best_estimator_ 
+print("\nBest Parameters:") 
+print(grid_search.best_params_) 
+print("\nBest CV Accuracy:") 
+print(grid_search.best_score_) 
+# ------------------------------- 
+# 6. Predictions 
+# ------------------------------- 
+y_pred = best_model.predict(X_test) 
+# ------------------------------- 
+# 7. Classification Report 
+# ------------------------------- 
+print("\nClassification Report:") 
+print(classification_report(y_test, y_pred)) 
+# ------------------------------- 
+# 8. Confusion Matrix 
+# ------------------------------- 
+cm = confusion_matrix(y_test, y_pred) 
+plt.figure(figsize=(6, 5)) 
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues") 
+plt.title("Confusion Matrix - Random Forest (GridSearchCV)") 
+plt.xlabel("Predicted") 
+plt.ylabel("Actual") 
+plt.show() 
+# ------------------------------- 
+# 9. Accuracy 
+# ------------------------------- 
+print(f"Test Accuracy: {accuracy_score(y_test, y_pred):.2f}") 
+# ------------------------------- 
+# 10. ROC Curve + AUC 
+# ------------------------------- 
+RocCurveDisplay.from_estimator(best_model, X_test, y_test) 
+plt.title("ROC Curve - Best Random Forest") 
+plt.show() 
+print("ROC AUC Score:", roc_auc_score(y_test, 
+best_model.predict_proba(X_test)[:, 1])) 
