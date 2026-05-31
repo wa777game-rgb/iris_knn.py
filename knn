@@ -1,0 +1,61 @@
+Exercise 1: Hyper Parameter Tuning with KNN 
+import pandas as pd 
+import seaborn as sns 
+import matplotlib.pyplot as plt 
+from sklearn.model_selection import train_test_split, GridSearchCV 
+from sklearn.neighbors import KNeighborsClassifier 
+from sklearn.preprocessing import StandardScaler 
+from sklearn.metrics import accuracy_score, classification_report, 
+confusion_matrix, RocCurveDisplay 
+# 1. Load data 
+df = pd.read_csv('titanic.csv') 
+# 2. Preprocessing 
+cols_to_drop = ['PassengerId', 'Name', 'Ticket', 'Cabin'] 
+df = df.drop(columns=cols_to_drop) 
+df['Age'] = df['Age'].fillna(df['Age'].median()) 
+df['Embarked'] = df['Embarked'].fillna(df['Embarked'].mode()[0]) 
+df['Sex'] = df['Sex'].map({'male': 0, 'female': 1}) 
+df = pd.get_dummies(df, columns=['Embarked'], drop_first=True) 
+X = df.drop('Survived', axis=1) 
+y = df['Survived'] 
+# 3. Split 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, 
+random_state=42) 
+# --- CRITICAL FOR KNN: Scaling --- 
+scaler = StandardScaler() 
+X_train_scaled = scaler.fit_transform(X_train) 
+X_test_scaled = scaler.transform(X_test) 
+# 4. KNN Grid Search 
+# We tune 'n_neighbors' (K) and the 'weights' function 
+param_grid = { 
+'n_neighbors': [3, 5, 7, 9, 11, 15], 
+'p': [1, 2, 4, 8, 16], 
+'weights': ['uniform', 'distance'], 
+'metric': ['euclidean', 'manhattan'] 
+} 
+grid_knn = GridSearchCV(KNeighborsClassifier(), param_grid, cv=5) 
+grid_knn.fit(X_train_scaled, y_train) 
+print(f"Best Parameters: {grid_knn.best_params_}") 
+# 5. Evaluation 
+best_knn = grid_knn.best_estimator_ 
+preds = best_knn.predict(X_test_scaled) # Moved this line up so preds is 
+defined earlier 
+# ------------------------------- 
+# 1. Classification Report 
+# ------------------------------- 
+print("\nClassification Report:") 
+print(classification_report(y_test, preds)) # Changed y_pred to preds 
+# ------------------------------- 
+# 2. Confusion Matrix 
+# ------------------------------- 
+cm = confusion_matrix(y_test, preds) # Changed y_pred to preds 
+disp = ConfusionMatrixDisplay(confusion_matrix=cm) 
+disp.plot() 
+plt.title("Confusion Matrix") 
+plt.show() 
+print(f"Final Accuracy: {accuracy_score(y_test, preds):.2%}") 
+# ROC AUC Curve 
+RocCurveDisplay.from_estimator(best_knn, X_test_scaled, y_test, 
+color='darkgreen') 
+plt.title("ROC AUC Curve") 
+plt.show()
