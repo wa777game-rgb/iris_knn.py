@@ -1,0 +1,82 @@
+# Exercise 4 Linear Regression 
+from sklearn.linear_model import LinearRegression 
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt 
+# Data stored in a dictionary 
+data = { 
+"Hours_Studied": [2, 3, 4, 5], 
+"Exam_Score": [60, 70, 80, 85] 
+} 
+df=pd.DataFrame(data) 
+# Convert dictionary data into numpy arrays 
+X = df[["Hours_Studied"]] 
+Y = df["Exam_Score"] 
+# Create and train the model 
+model = LinearRegression() 
+model.fit(X, Y) 
+# Get slope and intercept 
+a = model.intercept_ 
+b = model.coef_[0] 
+print("=== Linear Regression (scikit-learn) ===") 
+print(f"Intercept (a): {a:.2f}") 
+print(f"Slope (b): {b:.2f}") 
+print(f"Regression Equation: Y = {a:.2f} + {b:.2f}X") 
+# Predict the exam scores 
+predicted_scores = model.predict(X) 
+# Calculate Sum of Squared Errors (SSE) 
+sse = ((Y - predicted_scores) ** 2).sum() 
+print(f"Sum of Squared Errors (SSE): {sse:.2f}") 
+# Plotting the regression line 
+plt.scatter(X, Y, color='blue', label='Actual Data') 
+plt.plot(X, predicted_scores, color='red', linestyle='dashed', 
+label='Regression Line') 
+plt.xlabel('Hours Studied') 
+plt.ylabel('Exam Scores') 
+plt.title('Linear Regression: Hours Studied vs Exam Scores') 
+plt.legend() 
+plt.show() 
+# Predict for 6 hours of study 
+x_new = pd.DataFrame([[6]], columns=["Hours_Studied"]) 
+y_pred = model.predict(x_new) 
+print(f"Predicted Exam Score for {x_new.iloc[0, 0]} hours studied: 
+{y_pred[0]:.2f}") 
+#Linear Regression 
+from sklearn.linear_model import LinearRegression 
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt 
+df=pd.read_csv("Experience-Salary.csv") 
+df.head() 
+# Extract values 
+X = df[["exp(in months)"]] 
+y = df["salary(in thousands)"] 
+# Create and train the model 
+model = LinearRegression() 
+model.fit(X, y) 
+# Get slope and intercept 
+a = model.intercept_ 
+b = model.coef_[0] 
+print("=== Linear Regression (scikit-learn) ===") 
+print(f"Intercept (a): {a:.2f}") 
+print(f"Slope (b): {b:.2f}") 
+print(f"Regression Equation: Y = {a:.2f} + {b:.2f}X") 
+# Predict the exam scores 
+predicted_scores = model.predict(X) 
+# Calculate Sum of Squared Errors (SSE) 
+sse = ((y - predicted_scores) ** 2).sum() 
+print(f"Sum of Squared Errors (SSE): {sse:.2f}") 
+# Plotting the regression line 
+plt.scatter(X, y, color='blue', label='Actual Data') 
+plt.plot(X, predicted_scores, color='red', linestyle='dashed', 
+label='Regression Line') 
+plt.xlabel('Experience in Months') 
+plt.ylabel('Salary in thousands') 
+plt.title('Linear Regression: Experience vs Salary') 
+plt.legend() 
+plt.show() 
+# Predict for 6 hours of study 
+x_new = pd.DataFrame([[36]], columns=["exp(in months)"]) 
+y_pred = model.predict(x_new) 
+print(f"Predicted Salary for Experience in  {x_new.iloc[0, 0]} months is: 
+{y_pred[0]:.2f}")
