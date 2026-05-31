@@ -1,0 +1,94 @@
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+import matplotlib.pyplot as plt
+# Step 1: Define constants
+CATEGORICAL_FEATURES = ['sales', 'salary']
+
+# Step 2: Load the dataset
+df = pd.read_excel('
+/content/HR_comma_sep.xlsx')
+
+# Step 3: Convert categorical variables to label encoding
+label_encoder = LabelEncoder()
+for feature in CATEGORICAL_FEATURES:
+df[feature] = label_encoder.fit_transform(df[feature])
+
+# Step 4: Standardize the numerical features
+scaler = StandardScaler()
+df_scaled = scaler.fit_transform(df)
+df_scaler = pd.DataFrame(df_scaled, columns=df.columns) 
+print(df_scaler.head())
+
+# Step 5: Apply K-Means clustering
+model = KMeans(n_clusters=3, random_state=42, n_init=10) 
+model.fit(df_scaler)
+
+# Step 6: Assign cluster labels to the original (unstandardized) data
+y = model.predict(df_scaler)
+
+# Step 7: Display the predicted cluster labels
+print("Predicted cluster labels:")
+print(y)
+
+#Step 8: Display Cluster centers
+print(model.cluster_centers_)
+# Plotting (adjusting to plot first few clusters and using correct variables)
+plt.figure(figsize=(10, 7))
+colors = ['green', 'orange', 'blue']
+# Plot up cluster (or a reasonable subset if N_CLUSTERS is very large)
+for i in range(3): 
+plt.scatter(df_scaler.iloc[y == i, 0], df_scaler.iloc[y == i, 1], 
+s=10, c=colors[i % len(colors)], label=f'Cluster {i+1}')
+plt scatter(df scaler iloc[y
+# Plot the cluster centers
+plt.scatter(model.cluster_centers_[:, 0], model.cluster_centers_[:, 1],
+s=250, marker='*', c='red', label='Centroids')
+i 0] df scaler iloc[y i 1]
+plt.xlabel(df_scaler.columns[0]) 
+plt.ylabel(df_scaler.columns[1]) 
+plt.legend()
+plt.title('K-Means Clustering Results (First two features)')
+plt.show()
+
+# Step 1: Generate sample data
+X, y = make_blobs(
+n_samples=150,        
+# number of data points
+n_features=2,         
+centers=3,            
+cluster_std=0.5,      
+shuffle=True,         
+random_state=0        
+)
+
+# Step 2: Create a KMeans model
+km = KMeans(
+n_clusters=3,         
+# number of clusters to form
+init='random',        
+n_init=10,            
+max_iter=300,         
+tol=1e 4
+tol=1e-4,             
+random_state=0        
+)
+
+# Step 3: Fit the model and predict cluster labels
+y_km = km.fit_predict(X)
+
+# Step 4: Display the predicted cluster labels
+print("Predicted cluster labels:")
+print(y_km)
+plt.scatter(X[y_km == 0, 0], X[y_km == 0, 1], s=50, c='lightgreen', label='Cluster 1')
+plt.scatter(X[y_km == 1, 0], X[y_km == 1, 1], s=50, c='orange', label='Cluster 2')
+plt.scatter(X[y_km == 2, 0], X[y_km == 2, 1], s=50, c='lightblue', label='Cluster 3')
+# Plot the cluster centers
+plt.scatter(km.cluster_centers_[:, 0], km.cluster_centers_[:, 1],
+s=250, marker='*', c='red', label='Centroids')
+plt.xlabel('X axis')
+plt.ylabel('Y axis')
+plt.legend()
+plt.title('K-Means Clustering Results')
+plt.show()
+
